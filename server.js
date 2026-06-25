@@ -20,78 +20,25 @@ let database = {
 // Initialize database from JSON file
 function initializeDatabase() {
   try {
-    const questoesPath = path.join(__dirname, '../pmp_flutter/assets/questoes_mobile.json');
+    // Try to load from questoes.json in the backend directory
+    const questoesPath = path.join(__dirname, 'questoes.json');
     
     if (fs.existsSync(questoesPath)) {
-      const questoesData = JSON.parse(fs.readFileSync(questoesPath, 'utf8'));
+      const data = JSON.parse(fs.readFileSync(questoesPath, 'utf8'));
+      database.modulos = data.modulos || [];
+      database.questoes = data.questoes || [];
       
-      // Initialize modules
-      database.modulos = [
-        { id: 1, nome: '1A', descricao: 'Módulo 1A - Conceitos Fundamentais', quantidade_questoes: 15 },
-        { id: 2, nome: '2A', descricao: 'Módulo 2A - Domínios de Desempenho', quantidade_questoes: 15 },
-        { id: 3, nome: 'Integrado', descricao: 'Simulado Integrado', quantidade_questoes: 24 }
-      ];
-
-      let questionId = 1;
-
-      // Load questions from modulo_1a
-      if (questoesData.modulo_1a && Array.isArray(questoesData.modulo_1a)) {
-        questoesData.modulo_1a.forEach((q, idx) => {
-          database.questoes.push({
-            id: questionId++,
-            modulo_id: 1,
-            numero: idx + 1,
-            pergunta: q.pergunta,
-            opcao_a: q.opcoes.a,
-            opcao_b: q.opcoes.b,
-            opcao_c: q.opcoes.c,
-            opcao_d: q.opcoes.d,
-            resposta_correta: q.resposta_correta.toLowerCase(),
-            dificuldade: q.dificuldade || 'médio'
-          });
-        });
-      }
-
-      // Load questions from modulo_2a
-      if (questoesData.modulo_2a && Array.isArray(questoesData.modulo_2a)) {
-        questoesData.modulo_2a.forEach((q, idx) => {
-          database.questoes.push({
-            id: questionId++,
-            modulo_id: 2,
-            numero: idx + 1,
-            pergunta: q.pergunta,
-            opcao_a: q.opcoes.a,
-            opcao_b: q.opcoes.b,
-            opcao_c: q.opcoes.c,
-            opcao_d: q.opcoes.d,
-            resposta_correta: q.resposta_correta.toLowerCase(),
-            dificuldade: q.dificuldade || 'médio'
-          });
-        });
-      }
-
-      // Load questions from integrado
-      if (questoesData.integrado && Array.isArray(questoesData.integrado)) {
-        questoesData.integrado.forEach((q, idx) => {
-          database.questoes.push({
-            id: questionId++,
-            modulo_id: 3,
-            numero: idx + 1,
-            pergunta: q.pergunta,
-            opcao_a: q.opcoes.a,
-            opcao_b: q.opcoes.b,
-            opcao_c: q.opcoes.c,
-            opcao_d: q.opcoes.d,
-            resposta_correta: q.resposta_correta.toLowerCase(),
-            dificuldade: q.dificuldade || 'médio'
-          });
-        });
-      }
-
       console.log('✅ Banco de dados inicializado com sucesso');
       console.log(`📊 Total de questões carregadas: ${database.questoes.length}`);
     } else {
-      console.warn('⚠️  Arquivo de questões não encontrado em:', questoesPath);
+      console.warn('⚠️  Arquivo questoes.json não encontrado em:', questoesPath);
+      console.warn('⚠️  Inicializando com estrutura vazia...');
+      
+      database.modulos = [
+        { id: 1, nome: '1A', descricao: 'Módulo 1A - Conceitos Fundamentais', quantidade_questoes: 0 },
+        { id: 2, nome: '2A', descricao: 'Módulo 2A - Domínios de Desempenho', quantidade_questoes: 0 },
+        { id: 3, nome: 'Integrado', descricao: 'Simulado Integrado', quantidade_questoes: 0 }
+      ];
     }
   } catch (err) {
     console.error('Erro ao inicializar banco:', err);
@@ -146,7 +93,7 @@ app.get('/api/questoes', (req, res) => {
       });
     } else if (modulo) {
       // Buscar por módulo específico
-      const moduloMap = { '1a': 1, '2a': 2, 'integrado': 3 };
+      const moduloMap = { '1a': 1, '2a': 2, 'integrado': 3, '1b': 1, '2b': 2, '3b': 3 };
       const moduloId = moduloMap[modulo.toLowerCase()];
 
       if (!moduloId) {
