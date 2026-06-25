@@ -1,0 +1,12 @@
+run = "node server.js"
+language = "nodejs"
+
+[env]
+PORT = "3001"
+
+[nix]
+channel = "stable-23_11"
+
+[[ports]]
+localPort = 3001
+externalPort = 443
